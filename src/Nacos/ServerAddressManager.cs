@@ -10,31 +10,30 @@
 
         private readonly List<string> _servers = new List<string>();
 
-        private int _offset = 0;
+        private int _offset;
 
         public ServerAddressManager(NacosOptions options)
         {
             var serverAddresses = options.ServerAddresses;
 
-            if (serverAddresses == null || !serverAddresses.Any()) throw new ArgumentNullException(" ServerAddresses can not be null or empty ");
+            if (serverAddresses == null || !serverAddresses.Any()) throw new ArgumentNullException($" ServerAddresses can not be null or empty ");
 
             foreach (var item in serverAddresses)
             {
-                var hostAndPort = string.Empty;
+                string hostAndPort;
 
                 var tmp = item.Split(':');
 
-                if (tmp.Length == 2)
+                switch (tmp.Length)
                 {
-                    hostAndPort = item;
-                }
-                else if (tmp.Length == 1)
-                {
-                    hostAndPort = $"{tmp[0]}:8848";
-                }
-                else
-                {
-                    throw new ArgumentException(" incorrect server address, it should be [ip:port] ");
+                    case 2:
+                        hostAndPort = item;
+                        break;
+                    case 1:
+                        hostAndPort = $"{tmp[0]}";
+                        break;
+                    default:
+                        throw new ArgumentException(" incorrect server address, it should be [ip:port] ");
                 }
 
                 _servers.Add(hostAndPort);
